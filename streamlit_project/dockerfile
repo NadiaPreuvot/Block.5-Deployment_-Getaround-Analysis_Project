@@ -1,0 +1,31 @@
+# Utiliser l'image de base Miniconda3
+
+FROM continuumio/miniconda3
+
+# Définir le répertoire de travail dans le conteneur
+
+WORKDIR /home/app
+
+# Installer les dépendances nécessaires avec conda ou pip
+RUN apt-get update -y 
+RUN apt-get install nano unzip
+RUN apt install curl -y
+
+# Installation des depedencies Python
+
+COPY requirements.txt /dependencies/requirements.txt
+RUN pip install -r /dependencies/requirements.txt
+
+# Copier les fichiers du projet dans le conteneur ( le local path va dans le container path)
+# ici le local et le container sont au meme endroit donc le local path devient un point "."
+# si par exemple app.py est dans un fichier app et docker est avec app, on doit faire ./app/app.py ou ./app ( dans ce cas la, copie tout le dossier)
+# le point "." est le dossier courant
+COPY . /home/app
+
+# Exposer le port sur lequel Streamlit s'exécute
+EXPOSE 8501
+
+# Commande pour exécuter l'application
+#CMD streamlit run --server.port $PORT app.py
+# Commande pour exécuter votre application
+CMD ["streamlit", "run", "app.py", "--server.port=8501"]
